@@ -37,25 +37,20 @@ import com.crs.flipkart.dao.StudentDaoOperation;
 public class StudentRestApi {
 	
 	
-	//private StudentImplementation studentImplementation = new StudentImplementation();
+	/**
+	 * Method to handle API request to view student
+	 * @param studentId
+	 * @return student
+	 * @throws SQLException 
+	 */
 	@GET
-	@Path("/viewStudents/{studentId}")
-	@Consumes("application/json")
+	@Path("/student/{studentId}")
+//	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Student viewStudent(@PathParam("studentId") int studentId){
 		
 		StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
 		Student student = new Student();
-//		student.setStudentId(3);
-//		student.setContactNo("1234");
-//		student.setAddress("AP");
-//		student.setGender(Gender.MALE);
-//		student.setGradeCardVisibility(true);
-//		student.setPasswordHash("123");
-//		student.setRole(Role.STUDENT);
-//		student.setUserId(3);
-//		student.setUsername("Vivek");
-//		student.setName("Vivek");
 		try {
 			student = studentDaoOperation.viewStudentDetails(studentId);
 			
@@ -64,7 +59,9 @@ public class StudentRestApi {
 		}
 		return student;
 	}
+	
 
+	
 	@POST
 	@Path("/add")
 	@Consumes("application/json")
@@ -78,7 +75,11 @@ public class StudentRestApi {
 	} 
 	
 	
-	
+	/**
+	 * Method to handle API request to view catalog
+	 * @return list of courses
+	 * @throws SQLException 
+	 */
 	@GET
 	@Path("/catalogue")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -93,52 +94,97 @@ public class StudentRestApi {
 	}
 	
 	
+	/**
+	 * Method to handle API request to view payment status
+	 * @param studentId
+	 * @return status ("SUCCESS"/"PENDING")
+	 * @throws SQLException 
+	 */
 	@GET
 	@Path("/paymentStatus/{studentId}")
 	@Consumes("application/json")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response paymentStatus(@PathParam("studentId") int studentId) {
-		StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
-       String result = studentDaoOperation.getPaymentStatus(studentId);
+	public Response paymentStatus(@PathParam("studentId") int studentId) {			//returns null
+	   StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
+	   String result = null;
+	   try {
+		   result = studentDaoOperation.getPaymentStatus(studentId);
+	   } catch (Exception e) {
+		   e.printStackTrace();
+	   }
+       
        return Response.status(Status.OK).entity(result).build();
 	}
 	
+	/**
+	 * Method to handle API request to view all students
+	 * @return list of students
+	 * @throws SQLException 
+	 */
 	@GET
 	@Path("/student")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response viewStudentData() {
-		StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
-       ArrayList<Student> result = studentDaoOperation.viewAllStudents();
-       System.out.print(result);
-       return Response.status(Status.OK).entity(result).build();
+	   StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
+	   
+	   try {
+		   ArrayList<Student> result = studentDaoOperation.viewAllStudents();
+		   return Response.status(Status.OK).entity(result).build();
+	   } catch (Exception e) {
+		   e.printStackTrace();
+		   return Response.status(Status.EXPECTATION_FAILED).entity("Exception occured").build();
+	   }
+       
 	}
 	
-	
+	/**
+	 * Method to handle API request to view catalog
+	 * @return list of courses
+	 * @throws SQLException 
+	 */
 	@GET
 	@Path("/studentRegistered/{studentId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response studentAlreadyRegistered(@PathParam("studentId") int studentId) {
-		StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
-       Boolean result = studentDaoOperation.studentAlreadyRegistered(studentId);
-       System.out.print(result);
-       return Response.status(Status.OK).entity(result).build();
+	   StudentDaoInterface studentDaoOperation = new StudentDaoOperation();
+	   try {
+		   Boolean result = studentDaoOperation.studentAlreadyRegistered(studentId);
+		   return Response.status(Status.OK).entity(result).build();
+	   } catch (Exception e) {
+		   e.printStackTrace();
+		   return Response.status(Status.EXPECTATION_FAILED).entity("Exception occured").build();
+	   }
 	}
 	
+	/**
+	 * Method to handle API request to view grade card of a student
+	 * @param studentId
+	 * @return gradecard
+	 * @throws SQLException 
+	 */
 	@GET
 	@Path("/gradecard/{studentId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response displayGradeCard(@PathParam("studentId") int studentId) {
 		CourseDaoInterface courseDaoImplementation = CourseDaoImplementation.getInstance();
-		StudentRegisteredCourses studentRegisteredCourses = courseDaoImplementation.getStudentRegisteredCourses(studentId);
-       return Response.status(Status.OK).entity(studentRegisteredCourses).build();
+		
+		try {
+			StudentRegisteredCourses studentRegisteredCourses = courseDaoImplementation.getStudentRegisteredCourses(studentId);
+	        return Response.status(Status.OK).entity(studentRegisteredCourses).build();
+		   } catch (Exception e) {
+			   e.printStackTrace();
+			   return Response.status(Status.EXPECTATION_FAILED).entity("Exception occured").build();
+		   }
 	}
 	
+	
+	//Utility to check if StudentApi is being hit
 	@GET
 	@Path("/")
 	public String hello() {
 		//return Response.status(Status.OK).entity("hello").build();
-		System.out.println("hello");
-		return "hello";
+		System.out.println("Student API Hit");
+		return "Hit Student API";
 	}
 	
 }
